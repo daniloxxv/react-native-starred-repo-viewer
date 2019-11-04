@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import {Text, Keyboard, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
@@ -22,6 +23,17 @@ export default function Main() {
   const [newUser, setNewUser] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    (async () => {
+      if (users.length > 0) {
+        await AsyncStorage.setItem('users', JSON.stringify(users));
+      } else {
+        const data = await AsyncStorage.getItem('users');
+        data && setUsers(JSON.parse(data));
+      }
+    })();
+  }, [users]);
+
   const handleAddUser = async () => {
     setLoading(true);
     const response = await api.get(`/users/${newUser}`);
@@ -31,6 +43,7 @@ export default function Main() {
     setLoading(false);
     Keyboard.dismiss();
   };
+
   return (
     <Container>
       <Form>
