@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Text, Keyboard, ActivityIndicator} from 'react-native';
+import {Keyboard, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -24,6 +24,8 @@ export default function Main() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Retrieving user data from asyncStorage and setting it when there are changes
+    // Using an IIFE, since effect functions cannot be asynchronous
     (async () => {
       if (users.length > 0) {
         await AsyncStorage.setItem('users', JSON.stringify(users));
