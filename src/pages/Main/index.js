@@ -55,7 +55,7 @@ export default function Main(props) {
         <Input
           autoCorrect={false}
           autoCapitalize="none"
-          placeholder="Add user"
+          placeholder="Enter a GitHub username"
           value={newUser}
           onChangeText={text => setNewUser(text)}
           returnKeyType="send"
