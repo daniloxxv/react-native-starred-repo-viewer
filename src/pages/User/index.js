@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import api from '../../services/api';
+import api, {asyncGetRequest} from '../../services/api';
 
 import {
   Container,
@@ -18,14 +18,15 @@ import {
 
 export default function User({navigation}) {
   const [stars, setStars] = useState([]);
+  const [page, setPage] = useState(1);
   const user = navigation.getParam('user');
   useEffect(() => {
-    (async () => {
-      const user = navigation.getParam('user');
-      const response = await api.get(`/users/${user.login}/starred`);
-      setStars(response.data);
-    })();
-  }, [navigation]);
+    asyncGetRequest(
+      api,
+      `/users/${user.login}/starred?per_page=5&page=${page}`,
+      data => setStars(prevStars => [...prevStars, ...data]),
+    );
+  }, [navigation, page, user.login]);
 
   return (
     <Container>
@@ -37,6 +38,8 @@ export default function User({navigation}) {
       <Stars
         data={stars}
         keyExtractor={({id}) => String(id)}
+        onEndReached={() => setPage(page + 1)}
+        onEndReachedThreshold={0.1}
         renderItem={({item}) => (
           <Starred>
             <OwnerAvatar source={{uri: item.owner.avatar_url}} />
