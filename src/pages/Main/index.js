@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
 import asyncStorage from '../../services/asyncStorage';
+import showErrorMessage from '../../services/showErrorMessage';
 
 import {
   Container,
@@ -32,6 +33,14 @@ export default function Main(props) {
   }, [users]);
 
   const handleAddUser = () => {
+    if (
+      users.some(({login}) => login.toLowerCase() === newUser.toLowerCase())
+    ) {
+      showErrorMessage({
+        message: 'The user you selected is already in the list',
+      });
+      return;
+    }
     setLoading(true);
     asyncGetRequest(
       api,
