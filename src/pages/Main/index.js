@@ -44,6 +44,9 @@ export default function Main(props) {
     Keyboard.dismiss();
   };
 
+  const handleDelete = index =>
+    setUsers([...users.slice(0, index), ...users.slice(index + 1)]);
+
   const handleNavigate = user => {
     const {navigation} = props;
     navigation.navigate('User', {user});
@@ -72,7 +75,7 @@ export default function Main(props) {
       <List
         data={users}
         keyExtractor={user => user.login}
-        renderItem={({item}) => (
+        renderItem={({item, index}) => (
           <User>
             <Avatar source={{uri: item.avatar_url}} />
             <Name>{item.name}</Name>
@@ -80,7 +83,7 @@ export default function Main(props) {
             <ProfileButton onPress={() => handleNavigate(item)}>
               <ProfileButtonText>View profile</ProfileButtonText>
             </ProfileButton>
-            <DeleteButton>
+            <DeleteButton onPress={() => handleDelete(index)}>
               <DeleteButtonText>Delete</DeleteButtonText>
             </DeleteButton>
           </User>
