@@ -1,6 +1,6 @@
 import React from 'react';
-import {View} from 'react-native';
+import {View, Text} from 'react-native';
 
-export default function User() {
-  return <View />;
+export default function User({navigation}) {
+  return <Text>{JSON.stringify(navigation.getParam('user'))}</Text>;
 }

@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import PropTypes from 'prop-types';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Keyboard, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -18,7 +19,7 @@ import {
   ProfileButtonText,
 } from './styles';
 
-export default function Main() {
+export default function Main(props) {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,11 @@ export default function Main() {
     setNewUser('');
     setLoading(false);
     Keyboard.dismiss();
+  };
+
+  const handleNavigate = user => {
+    const {navigation} = props;
+    navigation.navigate('User', {user});
   };
 
   return (
@@ -74,7 +80,7 @@ export default function Main() {
             <Avatar source={{uri: item.avatar_url}} />
             <Name>{item.name}</Name>
             <Bio>{item.bio}</Bio>
-            <ProfileButton onPress={() => {}}>
+            <ProfileButton onPress={() => handleNavigate(item)}>
               <ProfileButtonText>View profile</ProfileButtonText>
             </ProfileButton>
           </User>
@@ -86,4 +92,10 @@ export default function Main() {
 
 Main.navigationOptions = {
   title: 'Hola',
+};
+
+Main.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func,
+  }).isRequired,
 };
