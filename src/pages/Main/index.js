@@ -91,7 +91,7 @@ export default function Main(props) {
 }
 
 Main.navigationOptions = {
-  title: 'Hola',
+  title: 'Starred Repos Viewer',
 };
 
 Main.propTypes = {

@@ -1,11 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 
+import {
+  Container,
+  Header,
+  Avatar,
+  Name,
+  Bio,
+  Stars,
+  Starred,
+  OwnerAvatar,
+  Info,
+  Title,
+  Author,
+} from './styles';
+
 export default function User({navigation}) {
   const [stars, setStars] = useState([]);
-
+  const user = navigation.getParam('user');
   useEffect(() => {
     (async () => {
       const user = navigation.getParam('user');
@@ -14,7 +27,28 @@ export default function User({navigation}) {
     })();
   }, [navigation]);
 
-  return <Text>{JSON.stringify(stars)}</Text>;
+  return (
+    <Container>
+      <Header>
+        <Avatar source={{uri: user.avatar_url}} />
+        <Name>{user.name}</Name>
+        <Bio>{user.bio}</Bio>
+      </Header>
+      <Stars
+        data={stars}
+        keyExtractor={({id}) => String(id)}
+        renderItem={({item}) => (
+          <Starred>
+            <OwnerAvatar source={{uri: item.owner.avatar_url}} />
+            <Info>
+              <Title>{item.name}</Title>
+              <Author>{item.owner.login}</Author>
+            </Info>
+          </Starred>
+        )}
+      />
+    </Container>
+  );
 }
 
 User.navigationOptions = ({navigation}) => ({
@@ -23,6 +57,6 @@ User.navigationOptions = ({navigation}) => ({
 
 User.propTypes = {
   navigation: PropTypes.shape({
-    getParam: PropTypes.func,,
+    getParam: PropTypes.func,
   }).isRequired,
 };
