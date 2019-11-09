@@ -1,10 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Keyboard, ActivityIndicator} from 'react-native';
+import {Keyboard, ActivityIndicator, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
-import asyncStorage from '../../services/asyncStorage';
+import {
+  getAsyncStorageItem,
+  setAsyncStorageItem,
+} from '../../services/asyncStorage';
 import showErrorMessage from '../../services/showErrorMessage';
 
 import {
@@ -29,8 +32,9 @@ export default function Main(props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    asyncStorage(users, 'users', setUsers);
-  }, [users]);
+    const data = getAsyncStorageItem('users');
+    Array.isArray(data) && setUsers(data);
+  }, []);
 
   const handleAddUser = () => {
     if (
@@ -42,15 +46,13 @@ export default function Main(props) {
       return;
     }
     setLoading(true);
-    asyncGetRequest(
-      api,
-      `/users/${newUser}`,
-      ({name, login, bio, avatar_url}) =>
-        setUsers([...users, {name, login, bio, avatar_url}]),
+    asyncGetRequest(api, `/users/${newUser}`, user =>
+      setUsers([...users, user]),
     );
     setNewUser('');
     setLoading(false);
     Keyboard.dismiss();
+    setAsyncStorageItem('users', JSON.stringify(users));
   };
 
   const handleDelete = index =>

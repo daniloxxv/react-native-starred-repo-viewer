@@ -1,15 +1,19 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import showErrorMessage from './showErrorMessage';
 
-export default async (items, name, callback) => {
+export const getAsyncStorageItem = async name => {
   try {
-    if (items.length > 0) {
-      await AsyncStorage.setItem(name, JSON.stringify(items));
-    } else {
-      const data = await AsyncStorage.getItem(name);
-      data && callback(JSON.parse(data));
-    }
+    const data = await AsyncStorage.getItem(name);
+    return data ? JSON.parse(data) : null;
   } catch (err) {
-    showErrorMessage('Unable to retrieve items from async storage');
+    showErrorMessage({message: 'Unable to retrieve items from async storage'});
+  }
+};
+
+export const setAsyncStorageItem = async (item, name) => {
+  try {
+    await AsyncStorage.setItem(name, JSON.stringify(item));
+  } catch (err) {
+    showErrorMessage({message: 'Unable to use async storage'});
   }
 };

@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {ActivityIndicator} from 'react-native';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
@@ -20,14 +21,39 @@ import {
 export default function User({navigation}) {
   const [stars, setStars] = useState([]);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const user = navigation.getParam('user');
+
   useEffect(() => {
-    asyncGetRequest(
-      api,
-      `/users/${user.login}/starred?per_page=5&page=${page}`,
-      data => setStars(prevStars => [...prevStars, ...data]),
-    );
-  }, [navigation, page, user.login]);
+    // If there are no more starred repos to show, return before the AJAX call
+    if (done) {
+      return;
+    }
+    if (!done) {
+      setLoading(true);
+      asyncGetRequest(
+        api,
+        `/users/${user.login}/starred?per_page=5&page=${page}`,
+        data => {
+          setStars(prevStars => {
+            // Checking whether the query brought repeated data; using a set for performance
+            const prevIDs = prevStars.reduce(
+              (allStars, star) => allStars.add(star.id),
+              new Set(),
+            );
+            const lastOne = data.findIndex(star => prevIDs.has(star.id));
+            if (lastOne === -1) {
+              return [...prevStars, ...data];
+            } else {
+              setDone(true);
+              return [...prevStars, ...data.slice(0, lastOne)];
+            }
+          });
+        },
+      );
+    }
+  }, [done, navigation, page, user.login]);
 
   return (
     <Container>
@@ -51,6 +77,7 @@ export default function User({navigation}) {
           </Starred>
         )}
       />
+      {loading && <ActivityIndicator color="#eee" />}
     </Container>
   );
 }
