@@ -75,9 +75,27 @@ export const ProfileButton = styled(RectButton)`
   align-items: center;
   height: 36px;
 `;
+
 export const ProfileButtonText = styled.Text`
   font-size: 14px;
   font-weight: bold;
   color: #fff;
+  text-transform: uppercase;
+`;
+
+export const DeleteButton = styled(RectButton)`
+  margin-top: 10px;
+  align-self: stretch;
+  border-radius: 4px;
+  background: #999;
+  justify-content: center;
+  align-items: center;
+  height: 36px;
+`;
+
+export const DeleteButtonText = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
   text-transform: uppercase;
 `;

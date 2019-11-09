@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import AsyncStorage from '@react-native-community/async-storage';
 import {Keyboard, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
+import {asyncGetRequest} from '../../services/asyncRequests';
+import asyncStorage from '../../services/asyncStorage';
 
 import {
   Container,
   Form,
   Input,
   SubmitButton,
+  DeleteButton,
+  DeleteButtonText,
   List,
   User,
   Avatar,
@@ -25,23 +28,17 @@ export default function Main(props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Retrieving user data from asyncStorage and setting it when there are changes
-    // Using an IIFE, since effect functions cannot be asynchronous
-    (async () => {
-      if (users.length > 0) {
-        await AsyncStorage.setItem('users', JSON.stringify(users));
-      } else {
-        const data = await AsyncStorage.getItem('users');
-        data && setUsers(JSON.parse(data));
-      }
-    })();
+    asyncStorage(users, 'users', setUsers);
   }, [users]);
 
-  const handleAddUser = async () => {
+  const handleAddUser = () => {
     setLoading(true);
-    const response = await api.get(`/users/${newUser}`);
-    const {name, login, bio, avatar_url} = response.data;
-    setUsers([...users, {name, login, bio, avatar_url}]);
+    asyncGetRequest(
+      api,
+      `/users/${newUser}`,
+      ({name, login, bio, avatar_url}) =>
+        setUsers([...users, {name, login, bio, avatar_url}]),
+    );
     setNewUser('');
     setLoading(false);
     Keyboard.dismiss();
@@ -83,6 +80,9 @@ export default function Main(props) {
             <ProfileButton onPress={() => handleNavigate(item)}>
               <ProfileButtonText>View profile</ProfileButtonText>
             </ProfileButton>
+            <DeleteButton>
+              <DeleteButtonText>Delete</DeleteButtonText>
+            </DeleteButton>
           </User>
         )}
       />

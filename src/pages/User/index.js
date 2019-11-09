@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import api, {asyncGetRequest} from '../../services/api';
+import api from '../../services/api';
+import {asyncGetRequest} from '../../services/asyncRequests';
 
 import {
   Container,
