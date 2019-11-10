@@ -4,7 +4,7 @@ import showErrorMessage from './showErrorMessage';
 export const getAsyncStorageItem = async name => {
   try {
     const data = await AsyncStorage.getItem(name);
-    return data ? JSON.parse(data) : null;
+    return data;
   } catch (err) {
     showErrorMessage({message: 'Unable to retrieve items from async storage'});
   }

@@ -77,7 +77,7 @@ export default function User({navigation}) {
           </Starred>
         )}
       />
-      {loading && <ActivityIndicator color="#eee" />}
+      {loading && <ActivityIndicator color="#ddd" />}
     </Container>
   );
 }

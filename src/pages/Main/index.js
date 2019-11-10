@@ -4,10 +4,7 @@ import {Keyboard, ActivityIndicator, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
-import {
-  getAsyncStorageItem,
-  setAsyncStorageItem,
-} from '../../services/asyncStorage';
+import AsyncStorage from '@react-native-community/async-storage';
 import showErrorMessage from '../../services/showErrorMessage';
 
 import {
@@ -32,9 +29,17 @@ export default function Main(props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const data = getAsyncStorageItem('users');
-    Array.isArray(data) && setUsers(data);
+    (async () => {
+      const data = await AsyncStorage.getItem('users');
+      data && setUsers(JSON.parse(data));
+    })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      await AsyncStorage.setItem('users', JSON.stringify(users));
+    })();
+  }, [users]);
 
   const handleAddUser = () => {
     if (
@@ -52,7 +57,6 @@ export default function Main(props) {
     setNewUser('');
     setLoading(false);
     Keyboard.dismiss();
-    setAsyncStorageItem('users', JSON.stringify(users));
   };
 
   const handleDelete = index =>
