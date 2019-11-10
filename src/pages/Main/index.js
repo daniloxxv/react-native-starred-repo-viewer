@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Keyboard, ActivityIndicator, Text} from 'react-native';
+import {Keyboard, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
@@ -31,7 +31,7 @@ export default function Main(props) {
   useEffect(() => {
     (async () => {
       const data = await AsyncStorage.getItem('users');
-      data && setUsers(JSON.parse(data));
+      setUsers(JSON.parse(data));
     })();
   }, []);
 
