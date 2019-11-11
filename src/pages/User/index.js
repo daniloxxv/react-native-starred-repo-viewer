@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator} from 'react-native';
+import {TouchableNativeFeedback, ActivityIndicator} from 'react-native';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 import {asyncGetRequest} from '../../services/asyncRequests';
@@ -23,37 +23,30 @@ export default function User({navigation}) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+
   const user = navigation.getParam('user');
+  const refreshList = () => {
+    setStars([]);
+    setPage(1);
+  };
+  const handleNavigate = repo => {
+    navigation.navigate('RepoView', {repo});
+  };
 
   useEffect(() => {
     // If there are no more starred repos to show, return before the AJAX call
-    if (done) {
-      return;
-    }
-    if (!done) {
-      setLoading(true);
-      asyncGetRequest(
-        api,
-        `/users/${user.login}/starred?per_page=5&page=${page}`,
-        data => {
-          setStars(prevStars => {
-            // Checking whether the query brought repeated data; using a set for performance
-            const prevIDs = prevStars.reduce(
-              (allStars, star) => allStars.add(star.id),
-              new Set(),
-            );
-            const lastOne = data.findIndex(star => prevIDs.has(star.id));
-            if (lastOne === -1) {
-              return [...prevStars, ...data];
-            } else {
-              setDone(true);
-              return [...prevStars, ...data.slice(0, lastOne)];
-            }
-          });
-        },
-      );
-    }
-  }, [done, navigation, page, user.login]);
+    setLoading(true);
+    asyncGetRequest(api, `/users/${user.login}/starred?page=${page}`, data => {
+      setStars(prevStars => {
+        if (data.length === 0) {
+          setDone(true);
+          return prevStars;
+        }
+        return [...prevStars, ...data];
+      });
+      setLoading(false);
+    });
+  }, [page, user.login]);
 
   return (
     <Container>
@@ -65,15 +58,19 @@ export default function User({navigation}) {
       <Stars
         data={stars}
         keyExtractor={({id}) => String(id)}
-        onEndReached={() => setPage(page + 1)}
-        onEndReachedThreshold={0.1}
+        onEndReached={() => !done && setPage(page + 1)}
+        onRefresh={refreshList}
+        refreshing={loading && stars.length === 0}
+        onEndReachedThreshold={0}
         renderItem={({item}) => (
           <Starred>
             <OwnerAvatar source={{uri: item.owner.avatar_url}} />
-            <Info>
-              <Title>{item.name}</Title>
-              <Author>{item.owner.login}</Author>
-            </Info>
+            <TouchableNativeFeedback onPress={() => handleNavigate(item)}>
+              <Info>
+                <Title>{item.name}</Title>
+                <Author>{item.owner.login}</Author>
+              </Info>
+            </TouchableNativeFeedback>
           </Starred>
         )}
       />
